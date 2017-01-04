@@ -32,7 +32,7 @@ Distributed Configuration Management Platform(分布式配置管理平台)
 - 提问题: https://github.com/knightliao/disconf/issues 提issue
 
 ## 版本
-
+- biyao(from master): 2.6.37 support for biyao env
 - dev(dev branch): 2.6.36
 - master(latest && cooperate && contribute branch)：2.6.36
 - stable(release && stable branch): 2.6.36

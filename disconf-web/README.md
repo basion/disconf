@@ -52,7 +52,7 @@ disconf-web
 
 ## How to deploy ##
 
-###安装依赖软件###
+### 安装依赖软件 ###
 
 - 安装Mysql（Ver 14.12 Distrib 5.0.45, for unknown-linux-gnu (x86_64) using  EditLine wrapper）
 - 安装Tomcat（apache-tomcat-7.0.50）
@@ -61,114 +61,174 @@ disconf-web
 - 安装 Redis （2.4.5）
 
 ### 准备配置 ###
-	
-**将你的配置文件放到此地址目录下（以下地址可自行设定）：**
 
-	home/work/dsp/disconf-rd/online-resources
-**如果不确定如何配置，可以拷贝/disconf-web/profile/rd/目录下的文件，拷贝过去后修改即可。**
-
-配置文件包括：
-
-	- jdbc-mysql.properties (数据库配置)
-	- redis-config.properties (Redis配置)
-	- zoo.properties (Zookeeper配置)
-	- application.properties (应用配置）
-
-注意，记得执行将application-demo.properties复制成application.properties：
- 
-    cp application-demo.properties application.properties 
-
-***注意，即使只有一个redis，也应该配置两个redis client，否则将造成内部错误。***
+#### rd ####
 
 
-**设置War包将要被部署的地址（以下地址可自行设定）：**
+> 替换相关配置信息，配置文件包括：
+> 
+>     - jdbc-mysql.properties (数据库配置)
+>     - redis-config.properties (Redis配置)
+>     - zoo.properties (Zookeeper配置)
+>     - application.properties (应用配置）
+> 
+> ***注意，即使只有一个redis，也应该配置两个redis client，否则将造成内部错误。***
+>
+> 
+> ### 构建 ###
+> 
+> 
+> **进入disconf-web目录，运行构建命令**
+> 
+>     mvn clean package -Dmaven.test.skip=true -P rd
+> 
+> 这样会在  disconf-web/target/ 生成以下结果：
+> 
+>     -disconf-web.war  
+>     -disconf-web  
+>     ...
+> 
+>
+> ### 部署前的初始化工作 ###
+> 
+> **初始化数据库：**
+> 
+> 可以参考 sql/readme.md 来进行数据库的初始化。注意顺序执行
+> 0-init_table.sql        
+> 1-init_data.sql         
+> 201512/20151225.sql
+> 20160701/20160701.sql
+> 
+> 里面默认有6个用户（**请注意线上环境删除这些用户以避免潜在的安全问题**）
+> 
+> name | pwd
+> ------- | -------
+> admin | admin
+> testUser1 | MhxzKhl9209
+> testUser2 | MhxzKhl167
+> testUser3 | MhxzKhl783
+> testUser4 | MhxzKhl8758
+> testUser5 | MhxzKhl112
+> 
+> 如果想自己设置初始化的用户名信息，可以参考代码来自己生成用户：
+> 
+>     src/main/java/com/baidu/disconf/web/tools/UserCreateTools.java
+> 
+> ### 部署War ###
+> 
+> 
+> **拷贝disconf-web相关文件到tomcat目录下**
+> -   方法1：target/disconf-web/*  >  tomcat/webapps/ROOT
+> -   方法2：target/disconf-web.war  >  tomcat/webapps
+> >     修改server.xml文件，在Host结点下设定Context：
+> >     <Context path="" docBase="tomcat/webapps/disconf-web"></Context>
+> 
+> 设置端口为 8015
+> 
+> 启动Tomcat，即可。
+>    访问地址http://ip:8015/index.html
 
-	/home/work/dsp/disconf-rd/war
 
-
-### 构建 ###
-
-	ONLINE_CONFIG_PATH=/home/work/dsp/disconf-rd/online-resources
-	WAR_ROOT_PATH=/home/work/dsp/disconf-rd/war
-	export ONLINE_CONFIG_PATH
-	export WAR_ROOT_PATH
-	cd disconf-web
-	sh deploy/deploy.sh
-
-这样会在	/home/work/dsp/disconf-rd/war 生成以下结果：
-
-	-disconf-web.war  
-	-html  
-	-META-INF  
-	-WEB-INF
-
-### 上线前的初始化工作 ###
-
-**初始化数据库：**
-
-可以参考 sql/readme.md 来进行数据库的初始化。注意顺序执行
-0-init_table.sql        
-1-init_data.sql         
-201512/20151225.sql
-20160701/20160701.sql
-
-里面默认有6个用户（**请注意线上环境删除这些用户以避免潜在的安全问题**）
-
-name | pwd
-------- | -------
-admin | admin
-testUser1 | MhxzKhl9209
-testUser2 | MhxzKhl167
-testUser3 | MhxzKhl783
-testUser4 | MhxzKhl8758
-testUser5 | MhxzKhl112
-
-如果想自己设置初始化的用户名信息，可以参考代码来自己生成用户：
-
-    src/main/java/com/baidu/disconf/web/tools/UserCreateTools.java
-
-### 部署War ###
-
-修改server.xml文件，在Host结点下设定Context：
-
-	<Context path="" docBase="/home/work/dsp/disconf-rd/war"></Context>
-
-并设置端口为 8015
-
-启动Tomcat，即可。
-
-### 部署 前端 ###
-
-修改 nginx.conf
-
-    upstream disconf {
-        server 127.0.0.1:8015;
-    }
-
-    server {
-
-        listen   8081;
-        server_name disconf.com;
-        access_log /home/work/var/logs/disconf/access.log;
-        error_log /home/work/var/logs/disconf/error.log;
-
-        location / {
-            root /home/work/dsp/disconf-rd/war/html;
-            if ($query_string) {
-                expires max;
-            }
-        }
-
-        location ~ ^/(api|export) {
-            proxy_pass_header Server;
-            proxy_set_header Host $http_host;
-            proxy_redirect off;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Scheme $scheme;
-            proxy_pass http://disconf;
-        }
-    }
     
+
+#### online with nginx ####
+    
+> 替换相关配置信息disconf-web/online，配置文件包括：
+> 
+>     - jdbc-mysql.properties (数据库配置)
+>     - redis-config.properties (Redis配置)
+>     - zoo.properties (Zookeeper配置)
+>     - application.properties (应用配置）
+> 
+> ***注意，即使只有一个redis，也应该配置两个redis client，否则将造成内部错误。***
+>
+> 
+> ### 构建 ###
+> 
+> 
+> **进入disconf-web目录，运行构建命令**
+> 
+>     mvn clean package -Dmaven.test.skip=true -P online
+> 
+> 这样会在  disconf-web/target/ 生成以下结果：
+> 
+>     -disconf-web.war  
+>     -disconf-web  
+>     ...
+> 
+>
+> ### 部署前的初始化工作 ###
+> 
+> **初始化数据库：**
+> 
+> 可以参考 sql/readme.md 来进行数据库的初始化。注意顺序执行
+> 0-init_table.sql        
+> 1-init_data.sql         
+> 201512/20151225.sql
+> 20160701/20160701.sql
+> 
+> 里面默认有6个用户（**请注意线上环境删除这些用户以避免潜在的安全问题**）
+> 
+> name | pwd
+> ------- | -------
+> admin | admin
+> testUser1 | MhxzKhl9209
+> testUser2 | MhxzKhl167
+> testUser3 | MhxzKhl783
+> testUser4 | MhxzKhl8758
+> testUser5 | MhxzKhl112
+> 
+> 如果想自己设置初始化的用户名信息，可以参考代码来自己生成用户：
+> 
+>     src/main/java/com/baidu/disconf/web/tools/UserCreateTools.java
+> 
+> ### 部署War ###
+> 
+> 
+> **拷贝disconf-web相关文件到tomcat目录下**
+>  -   方法1：target/disconf-web  >  tomcat/webapps/
+>  -   方法2：target/disconf-web.war  >  tomcat/webapps/
+>  -   修改server.xml文件，在Host结点下设定Context：
+> >      <Context path="" docBase="tomcat/webapps/disconf-web"></Context>
+> 
+> 设置端口为 8015
+> 
+> 启动Tomcat，即可。
+>
+>     访问地址http://ip:8015/index.html
+> 
+> ### 部署 前端 ###
+> 
+> 修改 nginx.conf
+> 
+>     upstream disconf {
+>         server 127.0.0.1:8015;
+>     }
+> 
+>     server {
+> 
+>         listen   8081;
+>         server_name disconf.com;
+>         access_log /usr/local/biyaolog/disconf-web/access.log;
+>         error_log /usr/local/biyaolog/disconf-web/error.log;
+> 
+>         location / {
+>             root /usr/local/tomcat_disconf-web_8080/webapps/disconf-web/html;
+>             if ($query_string) {
+>                 expires max;
+>             }
+>         }
+> 
+>         location ~ ^/(api|export) {
+>             proxy_pass_header Server;
+>             proxy_set_header Host $http_host;
+>             proxy_redirect off;
+>             proxy_set_header X-Real-IP $remote_addr;
+>             proxy_set_header X-Scheme $scheme;
+>             proxy_pass http://disconf;
+>         }
+>     }
+     
 ### 关于host
 
 这里的 host 设置成 disconf.com （可以自定义），但它 必须与 application.properties 里的domain一样。

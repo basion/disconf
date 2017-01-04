@@ -216,10 +216,11 @@
                 + ' machineinfo' + item.configId
                 + '" data-placement="left">' + item.machineSize + '台 '
                 + isRight + '</a>'
-
-            return Util.string.format(mainTpl,'', item.appId,
+            var createTime = item.createTime ? Util.date.dateFormat(item.createTime, "yyyy-MM-dd HH:mm:ss") : item.createTime;
+            var modifyTime = item.modifyTime ? Util.date.dateFormat(item.modifyTime, "yyyy-MM-dd HH:mm:ss") : item.modifyTime;
+            return Util.string.format(mainTpl, '', item.appId,
                 item.version, item.envId, item.envName, type, item.key,
-                item.createTime, item.modifyTime, item.value, link,
+                createTime, modifyTime, item.value, link,
                 del_link, i + 1, downloadlink, data_fetch_url, machine_url);
         }
     }

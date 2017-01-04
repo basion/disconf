@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.baidu.disconf</groupId>
         <artifactId>disconf-base</artifactId>
-        <version>2.6.36</version>
+        <version>2.6.37</version>
     </parent>
 
     <dependencies>
@@ -354,20 +354,30 @@
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${project.basedir}/src/main/resources</directory>
-                            <includes>
-                                <include>**/*.*</include>
-                            </includes>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-war-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<webResources>-->
+                        <!--<resource>-->
+                            <!--<directory>${project.basedir}/src/main/resources</directory>-->
+                            <!--<targetPath>WEB-INF/classes</targetPath>-->
+                            <!--<includes>-->
+                                <!--<include>**/*.*</include>-->
+                            <!--</includes>-->
+                        <!--</resource>-->
+                        <!--<resource>-->
+                            <!--<directory>${project.basedir}/html</directory>-->
+                            <!--&lt;!&ndash;<targetPath>html</targetPath>&ndash;&gt;-->
+                            <!--<includes>-->
+                                <!--<include>assets/**/*.*</include>-->
+                                <!--<include>dep/**/*.*</include>-->
+                                <!--<include>*.html</include>-->
+                            <!--</includes>-->
+                        <!--</resource>-->
+                    <!--</webResources>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
 
         </plugins>
     </build>
@@ -386,6 +396,32 @@
                         <directory>${basedir}/profile/rd</directory>
                     </resource>
                 </resources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <webResources>
+                                <resource>
+                                    <directory>${project.basedir}/src/main/resources</directory>
+                                    <targetPath>WEB-INF/classes</targetPath>
+                                    <includes>
+                                        <include>**/*.*</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/html</directory>
+                                    <!--<targetPath>html</targetPath>-->
+                                    <includes>
+                                        <include>assets/**/*.*</include>
+                                        <include>dep/**/*.*</include>
+                                        <include>*.html</include>
+                                    </includes>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
 
@@ -407,7 +443,8 @@
                             <webResources>
 
                                 <resource>
-                                    <directory>${project.build.online.sourceDir}</directory>
+                                    <!--<directory>${project.build.online.sourceDir}</directory>-->
+                                    <directory>${basedir}/profile/online</directory>
                                     <targetPath>WEB-INF/classes</targetPath>
                                     <includes>
                                         <include>**/*.*</include>
@@ -415,7 +452,18 @@
                                 </resource>
 
                                 <resource>
-                                    <directory>${project.build.online.sourceDir}</directory>
+                                    <directory>${project.basedir}/html</directory>
+                                    <targetPath>html</targetPath>
+                                    <includes>
+                                        <include>assets/**/*.*</include>
+                                        <include>dep/**/*.*</include>
+                                        <include>*.html</include>
+                                    </includes>
+                                </resource>
+
+                                <resource>
+                                    <!--<directory>${project.build.online.sourceDir}</directory>-->
+                                    <directory>${basedir}/profile/online</directory>
                                     <targetPath>/</targetPath>
                                 </resource>
 
