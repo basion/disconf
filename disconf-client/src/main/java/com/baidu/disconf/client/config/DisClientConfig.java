@@ -177,6 +177,16 @@ public final class DisClientConfig {
     public String userDefineDownloadDir = "./disconf/download";
 
     /**
+     * 开启classpath路径定义，下载文件夹会相对classpath进行创建
+     *
+     * @author
+     * @since 1.0.0
+	 * @date 2017-1-4 10:59:12
+     */
+    @DisInnerConfigAnnotation(name = "disconf.user_define_download_dir_in_class_path", defaultValue = "false")
+    public boolean userDefineDownloadDirInClassPath = false;
+
+    /**
      * 获取远程配置 重试时休眠时间，默认是5秒
      *
      * @author

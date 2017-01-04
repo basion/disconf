@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.baidu.disconf.client.config.DisClientConfig;
+import com.baidu.disconf.core.common.utils.ClassLoaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +115,11 @@ public class FetcherMgrImpl implements FetcherMgr {
     private String getLocalDownloadDirPath() throws Exception {
 
         String localUrl = localDownloadDir;
+
+		//添加自定义下载路径是否基于classpath创建的开关
+        if (DisClientConfig.getInstance().userDefineDownloadDirInClassPath) {
+            localUrl = ClassLoaderUtil.getClassPath() + localDownloadDir;
+        }
 
         if (!new File(localUrl).exists()) {
             new File(localUrl).mkdirs();
