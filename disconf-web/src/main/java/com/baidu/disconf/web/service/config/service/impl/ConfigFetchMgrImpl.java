@@ -2,6 +2,7 @@ package com.baidu.disconf.web.service.config.service.impl;
 
 import java.util.List;
 
+import com.baidu.disconf.web.utils.CodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class ConfigFetchMgrImpl implements ConfigFetchMgr {
         }
 
         ValueVo valueVo = new ValueVo();
-        valueVo.setValue(config.getValue());
+        valueVo.setValue(CodeUtils.unicodeToUtf8(config.getValue()));
         valueVo.setStatus(Constants.OK);
 
         return valueVo;

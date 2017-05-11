@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.baidu.disconf.web.config.ApplicationPropertyConfig;
 
+import java.util.Properties;
+
 /**
  * 邮件发送公共类
  *
@@ -76,6 +78,14 @@ public class MailBean implements InitializingBean {
         if (!StringUtils.isEmpty(emailProperties.getEmailPassword())) {
             mailSender.setPassword(emailProperties.getEmailPassword());
         }
+        if (emailProperties.isEmailSSLOn()) {
+            Properties pro = new Properties();
+            //登录SMTP服务器,需要获得授权
+            pro.put("mail.smtp.starttls.enable", "true");
+            pro.put("mail.smtp.socketFactory.class", emailProperties.getEmailSSLFactory());
+            mailSender.setJavaMailProperties(pro);
+        }
+
 
         if (!StringUtils.isEmpty(emailProperties.getEmailPort())) {
 

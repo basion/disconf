@@ -1,7 +1,6 @@
 package com.baidu.disconf.web.service.config.service.impl;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -105,7 +104,6 @@ public class ConfigMgrImpl implements ConfigMgr {
      * 配置文件的整合
      *
      * @param confListForm
-     *
      * @return
      */
     public List<File> getDisconfFileList(ConfListForm confListForm) {
@@ -125,10 +123,43 @@ public class ConfigMgrImpl implements ConfigMgr {
             if (config.getType().equals(DisConfigTypeEnum.FILE.getType())) {
 
                 File file = new File(curTime, config.getName());
+                BufferedReader reader = null;
+                OutputStream out = null;
+                BufferedWriter bw = null;
                 try {
-                    FileUtils.writeByteArrayToFile(file, config.getValue().getBytes());
+
+                    reader = new BufferedReader(new InputStreamReader(IOUtils.toInputStream(config.getValue()), "UTF-8"));
+                    out = new FileOutputStream(file);
+                    bw = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        bw.write(CodeUtils.unicodeToUtf8(line));
+                        bw.newLine();
+                    }
+                    reader.close();
+                    bw.flush();
+                    bw.close();
+                    out.flush();
+                    out.close();
                 } catch (IOException e) {
-                    LOG.warn(e.toString());
+                    LOG.error("writer " + config.getName() + " failed!");
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (reader != null) {
+                            reader.close();
+                        }
+                        if (bw != null) {
+                            bw.close();
+                        }
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        LOG.error("writer " + config.getName() + " failed! stream not close !");
+                        e.printStackTrace();
+                    }
                 }
 
                 files.add(file);
@@ -263,6 +294,10 @@ public class ConfigMgrImpl implements ConfigMgr {
         Config config = getConfigById(configId);
         String oldValue = config.getValue();
 
+        // 时间
+        String curTime = DateUtils.ISO_DATETIME_FORMAT.format(new Date());
+        config.setUpdateTime(curTime);
+
         //
         // 配置数据库的值 encode to db
         //
@@ -275,8 +310,11 @@ public class ConfigMgrImpl implements ConfigMgr {
         String toEmails = appMgr.getEmails(config.getAppId());
 
         if (applicationPropertyConfig.isEmailMonitorOn()) {
+            config.setCreateTime(DateUtils.ISO_DATETIME_FORMAT.format(DateUtils.parseDate(config.getCreateTime(), DataFormatConstants.COMMON_TIME_FORMAT)));
+            config.setValue(value);
+
             boolean isSendSuccess = logMailBean.sendHtmlEmail(toEmails,
-                    " config update", DiffUtils.getDiff(CodeUtils.unicodeToUtf8(oldValue),
+                    "config update", DiffUtils.getDiff(CodeUtils.unicodeToUtf8(oldValue),
                             value,
                             config.toString(),
                             getConfigUrlHtml(config)));
@@ -348,7 +386,11 @@ public class ConfigMgrImpl implements ConfigMgr {
         //
         String toEmails = appMgr.getEmails(config.getAppId());
         if (applicationPropertyConfig.isEmailMonitorOn() == true) {
-            logMailBean.sendHtmlEmail(toEmails, " config new", getNewValue(confNewForm.getValue(), config.toString(),
+            String curTimeFormat = DateUtils.ISO_DATETIME_FORMAT.format(DateUtils.parseDate(curTime, DataFormatConstants.COMMON_TIME_FORMAT));
+            config.setCreateTime(curTimeFormat);
+            config.setUpdateTime(curTimeFormat);
+
+            logMailBean.sendHtmlEmail(toEmails, "config new", getNewValue(confNewForm.getValue(), config.toString(),
                     getConfigUrlHtml(config)));
         }
     }
@@ -383,7 +425,6 @@ public class ConfigMgrImpl implements ConfigMgr {
      *
      * @param newValue
      * @param identify
-     *
      * @return
      */
     private String getNewValue(String newValue, String identify, String htmlClick) {
@@ -463,7 +504,6 @@ public class ConfigMgrImpl implements ConfigMgr {
      * 转换成配置返回
      *
      * @param config
-     *
      * @return
      */
     private ConfListVo convert(Config config, String appNameString, String envName, ZkDisconfData zkDisconfData) {
@@ -476,7 +516,7 @@ public class ConfigMgrImpl implements ConfigMgr {
         confListVo.setEnvName(envName);
         confListVo.setEnvId(config.getEnvId());
         confListVo.setCreateTime(config.getCreateTime());
-        confListVo.setModifyTime(config.getUpdateTime().substring(0, 12));
+        confListVo.setModifyTime(config.getUpdateTime());
         confListVo.setKey(config.getName());
         // StringEscapeUtils.escapeHtml escape
         confListVo.setValue(CodeUtils.unicodeToUtf8(config.getValue()));
@@ -489,7 +529,7 @@ public class ConfigMgrImpl implements ConfigMgr {
         //
         if (zkDisconfData != null) {
 
-            confListVo.setMachineSize(zkDisconfData.getData().size());
+//            confListVo.setMachineSize(zkDisconfData.getData().size());
 
             List<ZkDisconfDataItem> datalist = zkDisconfData.getData();
 
@@ -525,11 +565,11 @@ public class ConfigMgrImpl implements ConfigMgr {
                 // 配置项
                 //
 
-                if (zkDisconfDataItem.getValue().trim().equals(config.getValue().trim())) {
+                if (zkDisconfDataItem.getValue().trim().equals(CodeUtils.unicodeToUtf8(config.getValue()).trim())) {
 
                 } else {
                     List<String> errorKeyList = new ArrayList<String>();
-                    errorKeyList.add(config.getValue().trim());
+                    errorKeyList.add(CodeUtils.unicodeToUtf8(config.getValue()).trim());
                     zkDisconfDataItem.setErrorList(errorKeyList);
                     errorNum++;
                 }

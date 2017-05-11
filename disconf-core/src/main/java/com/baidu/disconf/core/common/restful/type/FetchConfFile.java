@@ -1,7 +1,8 @@
 package com.baidu.disconf.core.common.restful.type;
 
-import java.io.File;
+import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -51,7 +52,8 @@ public class FetchConfFile implements UnreliableInterface {
         LOGGER.debug("start to download. From: " + remoteUrl + " , TO: " + localTmpFile.getAbsolutePath());
 
         // 下载
-        FileUtils.copyURLToFile(remoteUrl, localTmpFile);
+//        FileUtils.copyURLToFile(remoteUrl, localTmpFile);
+        urlToStreamDownload(remoteUrl, localTmpFile);
 
         // check
         if (!OsUtil.isFileExist(localTmpFile.getAbsolutePath())) {
@@ -62,6 +64,48 @@ public class FetchConfFile implements UnreliableInterface {
         LOGGER.debug("download success!  " + localTmpFile.getAbsolutePath());
 
         return null;
+    }
+
+    private void urlToStreamDownload(URL url, File file) throws IOException {
+        BufferedReader reader = null;
+        OutputStream out = null;
+        BufferedWriter bw = null;
+        try {
+            URLConnection conn = url.openConnection();
+            reader = new BufferedReader(new InputStreamReader(conn.
+                    getInputStream()));
+            out = new FileOutputStream(file);
+            bw = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                bw.write(line);
+                bw.newLine();
+            }
+            reader.close();
+            bw.flush();
+            bw.close();
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            LOGGER.error(e.toString());
+            throw new IOException("download failed!", e);
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (bw != null) {
+                    bw.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                LOGGER.error(e.toString());
+                throw new IOException("download error, stream not close !", e);
+            }
+        }
     }
 
 }

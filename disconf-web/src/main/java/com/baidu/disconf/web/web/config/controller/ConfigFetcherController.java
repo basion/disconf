@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
+import com.baidu.disconf.web.utils.CodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,7 +160,7 @@ public class ConfigFetcherController extends BaseController {
     public HttpEntity<byte[]> downloadDspBill(String fileName, String value) {
 
         HttpHeaders header = new HttpHeaders();
-        byte[] res = value.getBytes();
+        byte[] res = CodeUtils.unicodeToUtf8(value).getBytes();
 
         String name = null;
 

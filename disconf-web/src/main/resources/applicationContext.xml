@@ -61,6 +61,8 @@
         <property name="emailUser" value="${EMAIL_HOST_USER}"/>
         <property name="emailPort" value="${EMAIL_PORT}"/>
         <property name="fromEmail" value="${DEFAULT_FROM_EMAIL}"/>
+        <property name="emailSSLOn" value="${EMAIL_SSL_ON}"/>
+        <property name="emailSSLFactory" value="${EMAIL_SSL_FACTORY}"/>
         <property name="emailReceiver" value="${EMAIL_RECEIVER}"/>
         <property name="emailMonitorOn" value="${EMAIL_MONITOR_ON}"/>
         <property name="checkConsistencyOn" value="${CHECK_CONSISTENCY_ON}"/>

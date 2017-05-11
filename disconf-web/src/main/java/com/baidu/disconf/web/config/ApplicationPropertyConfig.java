@@ -24,6 +24,10 @@ public class ApplicationPropertyConfig {
 
     private String emailReceiver;
 
+    private boolean emailSSLOn = false;
+
+    private String emailSSLFactory = "javax.net.ssl.SSLSocketFactory";
+
     private boolean emailMonitorOn = false;
 
     //
@@ -77,6 +81,22 @@ public class ApplicationPropertyConfig {
         this.fromEmail = fromEmail;
     }
 
+    public boolean isEmailSSLOn() {
+        return emailSSLOn;
+    }
+
+    public void setEmailSSLOn(boolean emailSSLOn) {
+        this.emailSSLOn = emailSSLOn;
+    }
+
+    public String getEmailSSLFactory() {
+        return emailSSLFactory;
+    }
+
+    public void setEmailSSLFactory(String emailSSLFactory) {
+        this.emailSSLFactory = emailSSLFactory;
+    }
+
     public boolean isEmailMonitorOn() {
         return emailMonitorOn;
     }
@@ -112,9 +132,10 @@ public class ApplicationPropertyConfig {
     @Override
     public String toString() {
         return "ApplicationPropertyConfig [emailHost=" + emailHost + ", emailPassword=" + emailPassword +
-                   ", emailUser=" + emailUser + ", emailPort=" + emailPort + ", fromEmail=" + fromEmail +
-                   ", emailReceiver=" + emailReceiver + ", emailMonitorOn=" + emailMonitorOn + ", checkConsistencyOn=" +
-                   checkConsistencyOn + "]";
+                ", emailUser=" + emailUser + ", emailPort=" + emailPort + ", fromEmail=" + fromEmail +
+                ", emailReceiver=" + emailReceiver + ", emailSSLOn=" + emailSSLOn + ", emailSSLFactory=" + emailSSLFactory +
+                ", emailMonitorOn=" + emailMonitorOn + ", checkConsistencyOn=" +
+                checkConsistencyOn + "]";
     }
 
 }

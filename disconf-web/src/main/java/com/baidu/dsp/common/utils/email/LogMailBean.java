@@ -144,7 +144,7 @@ public class LogMailBean {
             if (len > lenLimit) {
                 len = lenLimit;
             }
-            mailTitle += title.substring(0, len);
+            mailTitle = "[" + title.substring(0, len) + "] " + mailTitle;
         }
 
         String mailTo = toEmail;
@@ -213,7 +213,7 @@ public class LogMailBean {
             LOG.warn("When send alarm mail,we can't get hostname", e);
         }
 
-        String mailTitle = localName + " /" + ALARM_MAIL_TITLE + "/" + getSystemDate();
+        String mailTitle = "[error] " + localName + " /" + ALARM_MAIL_TITLE + "/" + getSystemDate();
 
         int len = 0;
         int lenLimit = ALARM_MAIL_TITLE_LENGTH;

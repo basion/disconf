@@ -63,7 +63,17 @@ public class ConfigUpdateController extends BaseController {
         // 更新, 并写入数据库
         //
         String emailNotification = "";
-        emailNotification = configMgr.updateItemValue(configId, value);
+        try {
+
+            String str = new String(value.getBytes("UTF-8"), "UTF-8");
+            LOG.info("receive item: " + str);
+
+            emailNotification = configMgr.updateItemValue(configId, value);
+            LOG.info("update " + configId + " ok");
+
+        } catch (Exception e) {
+            throw new FileUploadException("upload.item.error", e);
+        }
 
         //
         // 通知ZK
@@ -139,7 +149,7 @@ public class ConfigUpdateController extends BaseController {
         String emailNotification = "";
         try {
 
-            String str = new String(fileContent.getBytes(), "UTF-8");
+            String str = new String(fileContent.getBytes("UTF-8"), "UTF-8");
             LOG.info("receive file: " + str);
 
             emailNotification = configMgr.updateItemValue(configId, str);

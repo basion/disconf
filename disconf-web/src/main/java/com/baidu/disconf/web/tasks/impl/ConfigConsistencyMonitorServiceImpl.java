@@ -66,7 +66,7 @@ public class ConfigConsistencyMonitorServiceImpl implements IConfigConsistencyMo
      *
      */
     // 每30分钟执行一次自动化校验
-    @Scheduled(fixedDelay = 30 * 60 * 1000)
+    @Scheduled(fixedDelay = 3 * 60 * 1000)
     @Override
     public void check() {
 
@@ -174,7 +174,7 @@ public class ConfigConsistencyMonitorServiceImpl implements IConfigConsistencyMo
 
         if (errorList.size() != 0) {
 
-            logMailBean.sendHtmlEmail(toEmails, " monitor ConfigConsistency ",
+            logMailBean.sendHtmlEmail(toEmails, "monitor ConfigConsistency",
                     monitorInfo + "<br/><br/><br/>" + errorList.toString());
         }
     }

@@ -36,11 +36,11 @@
                         <a id="brand_url" href="/main.html" class="brand" style="margin-left:0px;padding:8px;"> <span class="zu-top-nav-link">Disconf</span> </a>
 
                         <span class="span2"> </span>
-                        <form class="navbar-form pull-left">
-                            <button class="btn btn-warning" title="GitHub" type="button" style=""  onclick="window.open('https://github.com/knightliao/disconf', '_blank');">
-                                <i class="icon-circle-arrow-up  icon-white"></i> <b>GitHub</b>
-                            </button>
-                        </form>
+                        <!--<form class="navbar-form pull-left">-->
+                            <!--<button class="btn btn-warning" title="GitHub" type="button" style=""  onclick="window.open('https://github.com/knightliao/disconf', '_blank');">-->
+                                <!--<i class="icon-circle-arrow-up  icon-white"></i> <b>GitHub</b>-->
+                            <!--</button>-->
+                        <!--</form>-->
                         
                         <ul class="nav pull-right" >
                             
@@ -115,7 +115,7 @@
                         &nbsp;一个月内免登录 </label>
 
                     <div class="form-submit">
-                        <a class="btn btn-primary" type="submit"> 登录 </a>
+                        <a class="btn btn-primary" type="button"> 登录 </a>
                     </div>
 
                     <br>
@@ -161,13 +161,19 @@
         <script src="assets/js/common.js"></script>
 
         <script>
-        var _hmt = _hmt || [];
-        (function() {
-          var hm = document.createElement("script");
-          hm.src = "//hm.baidu.com/hm.js?c4578bda90040ec19ded56112b82246f";
-          var s = document.getElementsByTagName("script")[0];
-          s.parentNode.insertBefore(hm, s);
-        })();
+            //回车提交事件
+            $("body").keydown(function() {
+                if (event.keyCode == "13") {//keyCode=13是回车键
+                    $('.form-submit').click();
+                }
+            });
+//        var _hmt = _hmt || [];
+//        (function() {
+//          var hm = document.createElement("script");
+//          hm.src = "//hm.baidu.com/hm.js?c4578bda90040ec19ded56112b82246f";
+//          var s = document.getElementsByTagName("script")[0];
+//          s.parentNode.insertBefore(hm, s);
+//        })();
         </script>
 
 

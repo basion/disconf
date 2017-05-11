@@ -97,7 +97,7 @@ public class UserController extends BaseController {
 
         // 过期时间
         int expireTime = LoginConstant.SESSION_EXPIRE_TIME;
-        if (signin.getRemember().equals(1)) {
+        if (signin.getRemember() == 1) {
             expireTime = LoginConstant.SESSION_EXPIRE_TIME2;
         }
 
